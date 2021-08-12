@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nodez! - New Container</title>
+    <link rel= "stylesheet" type= "text/css" href= "/static/main.css">
+</head>
+<body>
+<h1>Create a new container</h1>
+<br>
+{% if error %}
+ <h2> {{ error }} </h2>
+{% endif %}
+
+<form action="/CreateContainer" method="POST">
+    <input type="text" name="Name" placeholder="Enter Container Name: " required>
+    <input type="text" name="Image" placeholder="Enter Image Name: " required>
+    <input type="text" name="Port" placeholder="Enter Port : " pattern="^(\d{1,}:\d{1,})((\s*,\s*)\d{1,}:\d{1,})*$" >
+    <input type="text" name="Command" placeholder="Enter Command : " >
+    <input type="submit" value="Create" >
+</form>
+<a href="/"  style="position: fixed; left: 0; top: 8%;">
+    <input type="button" value="Home" />
+</a>
+</body>
+</html>

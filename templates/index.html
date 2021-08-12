@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nodez! - Your Containers</title>
+    <link rel= "stylesheet" type= "text/css" href= "/static/main.css">
+    <script src="https://kit.fontawesome.com/b4ce904a37.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<h1 style="width: 100%; display: flex; flex-direction: column; justify-content: center; text-align: center; margin-top: 5%;">Your containers</h1>
+<div class="container">
+
+	<div class="table">
+		<div class="table-header">
+			<div class="header__item"><a id="name" class="filter__link" href="#">ID</a></div>
+			<div class="header__item"><a id="wins" class="filter__link filter__link--number" href="#">Name</a></div>
+			<div class="header__item"><a id="draws" class="filter__link filter__link--number" href="#">Image</a></div>
+			<div class="header__item"><a id="losses" class="filter__link filter__link--number" href="#">Status</a></div>
+			<div class="header__item"><a id="total" class="filter__link filter__link--number" href="#">Actions</a></div>
+		</div>
+		<div class="table-content">
+			{% for container in dockers %}
+            <div class="table-row">
+                <div class="table-data">{{container.id}}</div>
+                <div class="table-data">{{container.name}}</div>
+                <div class="table-data">{{container.image}}</div>
+                <div class="table-data">{{container.status}}</div>
+                <div class="table-data">
+                    <i class="fas fa-play" onclick="StartDocker('{{container.id}}')"></i>
+                    <i class="fas fa-stop" onclick="StopDocker('{{container.id}}')"></i>
+                    <i class="fas fa-trash" onclick="DeleteDocker('{{container.id}}', false)"></i>
+                </div>
+            </div>
+        {% endfor %}
+		</div>
+	</div>
+</div>
+<a href="/NewDocker" style="position: fixed; left: 0; top: 8%;">
+    <input type="button" value="New Container" />
+</a>
+<a href="/NewImage" style="position: fixed; right: 0; top: 8%;">
+    <input type="button" value="New Image" />
+</a>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function DeleteDocker(dockerId) {
+        if (confirm('Are you sure you want to delete this container?')) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                    if(xmlHttp.responseText)
+                        {alert(xmlHttp.responseText)}
+                    else
+                        window.location.reload();
+                }
+            }
+            xmlHttp.open("GET", `/DeleteDocker?docker=${dockerId}` , true); // true for asynchronous
+            xmlHttp.send(null);
+        }
+    }
+
+    function StartDocker(dockerId) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                if(xmlHttp.responseText)
+                        {alert(xmlHttp.responseText)}
+                    else
+                        window.location.reload();
+            }
+        }
+        xmlHttp.open("GET", `/StartDocker?docker=${dockerId}` , true); // true for asynchronous
+        xmlHttp.send(null);
+    }
+
+    function StopDocker(dockerId) {
+        if (confirm('Are you sure you want to stop this container?')) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+                    if(xmlHttp.responseText)
+                        {alert(xmlHttp.responseText)}
+                    else
+                        window.location.reload();
+                }
+            }
+            xmlHttp.open("GET", `/StopDocker?docker=${dockerId}` , true); // true for asynchronous
+            xmlHttp.send(null);
+        }
+    }
+
+    var properties = [
+        'name',
+        'wins',
+        'draws',
+        'losses',
+        'total',
+    ];
+
+    $.each( properties, function( i, val ) {
+
+        var orderClass = '';
+
+        $("#" + val).click(function(e){
+            e.preventDefault();
+            $('.filter__link.filter__link--active').not(this).removeClass('filter__link--active');
+            $(this).toggleClass('filter__link--active');
+            $('.filter__link').removeClass('asc desc');
+
+            if(orderClass == 'desc' || orderClass == '') {
+                    $(this).addClass('asc');
+                    orderClass = 'asc';
+            } else {
+                $(this).addClass('desc');
+                orderClass = 'desc';
+            }
+
+            var parent = $(this).closest('.header__item');
+                var index = $(".header__item").index(parent);
+            var $table = $('.table-content');
+            var rows = $table.find('.table-row').get();
+            var isSelected = $(this).hasClass('filter__link--active');
+            var isNumber = $(this).hasClass('filter__link--number');
+
+            rows.sort(function(a, b){
+
+                var x = $(a).find('.table-data').eq(index).text();
+                    var y = $(b).find('.table-data').eq(index).text();
+
+                if(isNumber == true) {
+
+                    if(isSelected) {
+                        return x - y;
+                    } else {
+                        return y - x;
+                    }
+
+                } else {
+
+                    if(isSelected) {
+                        if(x < y) return -1;
+                        if(x > y) return 1;
+                        return 0;
+                    } else {
+                        if(x > y) return -1;
+                        if(x < y) return 1;
+                        return 0;
+                    }
+                }
+                });
+
+            $.each(rows, function(index,row) {
+                $table.append(row);
+            });
+
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>
